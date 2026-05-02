@@ -30,12 +30,35 @@ async def cmd_start(message: Message):
     )
 
 # 2. ТЕКСТОВЫЕ КНОПКИ ГЛАВНОГО МЕНЮ
+FAQ_TEXT = """
+📋 <b>Часто задаваемые вопросы</b>
+
+<b>💰 Курсы валют</b>
+▸ Откуда курсы? — ЦБ РФ + 2% комиссия
+▸ Почему курс отличается? — Банки добавляют свою маржу
+▸ Обновляются? — Да, каждый рабочий день ЦБ
+
+<b>🧮 Калькулятор</b>
+▸ Точный ли расчёт? — Ориентировочный, курс может измениться
+▸ Какие валюты? — USD, EUR, CNY, KZT
+▸ Комиссия включена? — Да, 2% от курса ЦБ
+
+<b>🔮 Прогноз от ИИ</b>
+▸ Это финансовый совет? — Нет, только аналитика
+▸ Почему медленно? — ИИ требует времени на генерацию
+▸ Можно доверять? — ИИ показывает тренд, не гарантию
+
+<b>🔐 Безопасность</b>
+▸ Бот крадёт данные? — Нет, бот не хранит личные данные
+▸ Это официальный проект? — Нет, частный проект s1lenZ
+
+<b>📞 Поддержка</b>
+▸ Ошибка? — Напиши: amiyume@gmail.com
+"""
+
 @router.message(F.text == 'FAQ') 
 async def get_help(message: Message):
-    await message.answer_photo(
-        photo='AgACAgIAAxkBAAMnaekBI1LV_SejNFUOrkPnF68QqVgAAiMYaxs9kEhL4v0vl_Tqba8BAAMCAAN3AAM7BA', 
-        caption='- FAQ (ответы на частые вопросы)'
-    )
+    await message.answer(FAQ_TEXT, parse_mode="HTML")
 
 @router.message(F.text == 'Кто автор бота?')
 async def who_is_avtor(message: Message):
