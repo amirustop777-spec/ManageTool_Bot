@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from tool import Valute_Manager, AI_Assistant
+from database import DataBase
 import app.keyboard as kb 
 
 router = Router()
@@ -14,20 +15,36 @@ class Form(StatesGroup):
     waiting_for_valtype = State()
     waiting_for_calc_val = State()   
     waiting_for_sum = State()
-    waiting_for_ai_val = State()     
+    waiting_for_ai_val = State()
+     
 
 # 1. КОМАНДА СТАРТ
 @router.message(CommandStart())
-async def cmd_start(message: Message):
+async def cmd_start(message: Message, db: DataBase):
+
+    user_id = message.from_user.id
+    user = await db.search_user(user_id)
+
+    if user:
+        await message.answer(
+                    "<b>С возвращением в строй!</b> 👋\n\n"
+                    "Рад снова тебя видеть. Твои данные в порядке, и я готов к выполнению новых задач.\n\n"
+                    "Чем займемся сегодня?",
+                    parse_mode="HTML",
+                    reply_markup=kb.main
+        )  
+    else:
+        await db.save_user(user_id, message.from_user.username)
+        await message.answer(
+            "<b>Добро пожаловать в ManageTool!</b> 🛠\n\n"
+            "Я тебя не нашел в своей базе данных, поэтому <b>успешно зарегистрировал</b> твой профиль.\n\n"
+            "Теперь тебе доступны все функции управления. Начнем работу?",
+            parse_mode="HTML",
+            reply_markup=kb.main
+        )
+
     await message.answer_sticker(sticker='CAACAgIAAxkBAAIEYGnzRnbCef3ZAuCz6TvNzSx70DIyAAL8swAC-nFYSySVJZD6Fu-dOwQ')
     
-    await message.answer(
-        f"👋 <b>{message.from_user.first_name}</b>, добро пожаловать в <b>ManageTool</b>!\n\n"
-        f"🚀 Твой персональный финансовый ассистент запущен.\n"
-        f"Используй меню ниже, чтобы начать работу.",
-        parse_mode="HTML", 
-        reply_markup=kb.main
-    )
 
 # 2. ТЕКСТОВЫЕ КНОПКИ ГЛАВНОГО МЕНЮ
 FAQ_TEXT = """
@@ -130,7 +147,7 @@ async def val_type_handler(message: Message, state: FSMContext):
 @router.message(F.text == 'Прогноз от ИИ')
 async def start_ai_forecast(message: Message, state: FSMContext):
     await state.set_state(Form.waiting_for_ai_val) 
-    await message.answer('📈 Аналитика DDG: Выберите валюту', reply_markup=kb.main1)
+    await message.answer('📈 Аналитика AI: Выберите валюту', reply_markup=kb.main1)
 
 @router.message(Form.waiting_for_ai_val)
 async def process_ai_forecast(message: Message, state: FSMContext):

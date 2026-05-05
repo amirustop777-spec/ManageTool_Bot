@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-from config import KEY
 import g4f
 
 
